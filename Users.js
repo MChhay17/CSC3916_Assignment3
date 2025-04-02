@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt'); // Use bcrypt, not bcrypt-nodejs
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.DB); // useNewUrlParser and useUnifiedTopology are no longer needed
-    console.log("Connected to MongoDB");
+    console.log("Connected to MongoDB-user");
   } catch (error) {
     console.error("MongoDB connection error:", error); // Log the actual error object
     process.exit(1); // Exit the process if the connection fails (optional, but good practice)
@@ -17,11 +17,14 @@ const connectDB = async () => {
 connectDB();
 
 
-const UserSchema = new Schema({
+
+const UserSchema = new mongoose.Schema({
     name: String,
-    username: { type: String, required: true, index: { unique: true } },
-    password: { type: String, required: true, select: false }
-});
+    username: { type: String, unique: true },
+    password: String, // this should be hashed in real-world scenario
+  });
+  
+  
 
 UserSchema.pre('save', async function(next) {  // Use async/await for cleaner code
     const user = this;
