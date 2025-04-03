@@ -72,3 +72,17 @@ Create a collection in MongoDB to hold information about movies
 - https://render.com/docs/deploy-create-react-app **important: Environment Variable for https://github.com/AliceNN-ucdenver/CSC3916_REACT env.REACT_APP_API_URL, this weekend I will look at changes (I believe only 1 change in the actions)
 
 // Postman Button Upload
+<div class="postman-run-button"
+data-postman-action="collection/fork"
+data-postman-visibility="public"
+data-postman-var-1="41738827-d3d4314a-1ec6-4b4f-8b2c-459427ab5a5a"
+data-postman-collection-url="entityId=41738827-d3d4314a-1ec6-4b4f-8b2c-459427ab5a5a&entityType=collection&workspaceId=ae8a8367-bd1d-406e-8eb9-4cd3b456f4c6"></div>
+<script type="text/javascript">
+  (function (p,o,s,t,m,a,n) {
+    !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
+    !o.getElementById(s+t) && o.getElementsByTagName("head")[0].appendChild((
+      (n = o.createElement("script")),
+      (n.id = s+t), (n.async = 1), (n.src = m), n
+    ));
+  }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+</script>
