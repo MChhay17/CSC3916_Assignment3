@@ -8,24 +8,14 @@ function MovieListPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please log in to view movies.");
-      navigate("/login");
-      return;
-    }
+    if (!token) return navigate("/login");
 
     axios
       .get(`${process.env.REACT_APP_API_URL}/movies?reviews=true`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => setMovies(res.data))
-      .catch((err) => {
-        console.error("Failed to load movies:", err);
-        alert("Unauthorized or error loading movies");
-      });
+      .catch(() => alert("Unauthorized or error loading movies"));
   }, [navigate]);
 
   return (
@@ -44,4 +34,5 @@ function MovieListPage() {
 }
 
 export default MovieListPage;
+
 
