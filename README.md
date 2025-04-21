@@ -76,8 +76,7 @@ Create a collection in MongoDB to hold information about movies
 data-postman-action="collection/fork"
 data-postman-visibility="public"
 data-postman-var-1="41738827-2afbb997-e43a-4e57-adc3-f869eee5f38d"
-data-postman-collection-url="entityId=41738827-2afbb997-e43a-4e57-adc3-f869eee5f38d&entityType=collection&workspaceId=ae8a8367-bd1d-406e-8eb9-4cd3b456f4c6"
-data-postman-param="env%5BTOKEN%5D=W3sia2V5IjoiVE9LRU4iLCJ2YWx1ZSI6IjxKU09OX1dFQl9UT0tFTj4iLCJlbmFibGVkIjp0cnVlLCJ0eXBlIjoiZGVmYXVsdCIsInNlc3Npb25WYWx1ZSI6IkpXVC4uLiIsImNvbXBsZXRlU2Vzc2lvblZhbHVlIjoiSldUIGV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUpwWkNJNklqWTRNRFUxTWpBNU9URTNNbVl4TnpJellqVXlOREJpTUNJc0luVnpaWEp1WVcxbElqb2liV2x6ZEdWeU1USXpJaXdpYVdGMElqb3hOelExTVRrd056QTJMQ0psZUhBaU9qRTNORFV4T1RRek1EWjkucHcwSDAzUF96bmxlWDEzeVlmRUZFZXR4MWplX0tCZ1pYdWpVWXNlMVNRd1xuIiwic2Vzc2lvbkluZGV4IjowfV0="></div>
+data-postman-collection-url="entityId=41738827-2afbb997-e43a-4e57-adc3-f869eee5f38d&entityType=collection&workspaceId=ae8a8367-bd1d-406e-8eb9-4cd3b456f4c6"></div>
 <script type="text/javascript">
   (function (p,o,s,t,m,a,n) {
     !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
