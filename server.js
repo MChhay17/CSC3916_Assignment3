@@ -23,9 +23,10 @@ const router = express.Router();
 mongoose.connect(process.env.DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => console.log("\u2705 Connected to MongoDB"))
-  .catch(err => console.error("\u274C MongoDB connection error:", err));
+}).then(() => console.log("✅ Connected to MongoDB"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
+// ====================== ROOT ======================
 app.get("/", (req, res) => {
   res.send("You made it !! --  Welcome to my API ");
 });
@@ -77,10 +78,28 @@ router.post('/signin', async (req, res) => {
 router.route('/movies')
   .get(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const movies = await Movie.find();
-      return res.status(200).json(movies);
+      const aggregate = [
+        {
+          $lookup: {
+            from: 'reviews',
+            localField: '_id',
+            foreignField: 'movieId',
+            as: 'movieReviews'
+          }
+        },
+        {
+          $addFields: {
+            avgRating: { $avg: '$movieReviews.rating' }
+          }
+        },
+        {
+          $sort: { avgRating: -1 }
+        }
+      ];
+      const movies = await Movie.aggregate(aggregate);
+      res.status(200).json(movies);
     } catch (error) {
-      return res.status(500).json({ success: false, message: 'Failed to fetch movies', error: error.message });
+      res.status(500).json({ success: false, message: 'Failed to fetch movies', error: error.message });
     }
   })
   .post(authJwtController.isAuthenticated, async (req, res) => {
@@ -109,7 +128,7 @@ router.route('/movies/:movieparameter')
     const includeReviews = req.query.reviews === 'true';
 
     try {
-      const movie = await Movie.findOne({ title: req.params.movieparameter });
+      const movie = await Movie.findById(req.params.movieparameter); // ✅ fixed to use _id
       if (!movie) return res.status(404).json({ success: false, message: 'Movie not found' });
 
       if (includeReviews) {
@@ -122,6 +141,11 @@ router.route('/movies/:movieparameter')
               foreignField: 'movieId',
               as: 'reviews'
             }
+          },
+          {
+            $addFields: {
+              avgRating: { $avg: '$reviews.rating' }
+            }
           }
         ]);
         return res.status(200).json(result[0]);
@@ -131,36 +155,6 @@ router.route('/movies/:movieparameter')
     } catch (err) {
       console.error('Aggregation error:', err);
       return res.status(500).json({ success: false, message: 'Failed to fetch movie', error: err.message });
-    }
-  })
-  .put(authJwtController.isAuthenticated, async (req, res) => {
-    try {
-      const { title, releaseDate, genre, actors, imageURL } = req.body;
-      const updatedMovie = await Movie.findOneAndUpdate(
-        { title: req.params.movieparameter },
-        { title, releaseDate, genre, actors, imageURL },
-        { new: true },
-      );
-
-      if (!updatedMovie) {
-        return res.status(404).json({ success: false, message: "Movie not found" });
-      }
-
-      res.status(200).json({ success: true, message: "Movie updated successfully", movie: updatedMovie });
-    } catch (err) {
-      res.status(500).json({ success: false, message: "Error updating movie" });
-    }
-  })
-  .delete(authJwtController.isAuthenticated, async (req, res) => {
-    try {
-      const deletedMovie = await Movie.findOneAndDelete({ title: req.params.movieparameter });
-      if (!deletedMovie) {
-        return res.status(404).json({ success: false, message: "Movie not found" });
-      }
-
-      res.status(200).json({ success: true, message: `Movie '${deletedMovie.title}' deleted successfully` });
-    } catch (err) {
-      res.status(500).json({ success: false, message: "Failed to delete movie" });
     }
   });
 
@@ -203,7 +197,6 @@ router.post('/reviews', authJwtController.isAuthenticated, async (req, res) => {
   }
 });
 
-
 router.get('/reviews', authJwtController.isAuthenticated, async (req, res) => {
   try {
     const reviews = await Review.find();
@@ -236,8 +229,9 @@ app.use('/', router);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
 module.exports = app;
+
 
