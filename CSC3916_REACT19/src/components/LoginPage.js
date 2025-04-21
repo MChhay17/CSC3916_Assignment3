@@ -6,24 +6,50 @@ function LoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/signin`, formData);
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
+
+      if (res.data && res.data.token) {
+        localStorage.setItem("token", res.data.token); // ✅ Save token
+        alert("Login successful!");
+        navigate("/"); // ✅ Redirect to Movie List
+      } else {
+        alert("Invalid login response from server.");
+      }
     } catch (err) {
-      alert("Login failed");
+      console.error("Login error:", err);
+      alert("Login failed. Please check your username and password.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input name="username" placeholder="Username" onChange={handleChange} required />
-      <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
-      <button type="submit">Log In</button>
+      <h2>Login</h2>
+      <input
+        name="username"
+        type="text"
+        placeholder="Username"
+        value={formData.username}
+        onChange={handleChange}
+        required
+      />
+      <br />
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        value={formData.password}
+        onChange={handleChange}
+        required
+      />
+      <br />
+      <button type="submit">Login</button>
     </form>
   );
 }
