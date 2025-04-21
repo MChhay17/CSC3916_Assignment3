@@ -4,7 +4,6 @@ import SignupPage from './components/SignupPage';
 import MovieListPage from './components/MovieListPage';
 import MovieDetailPage from './components/MovieDetailPage';
 
-
 function App() {
   return (
     <Router>
