@@ -17,9 +17,6 @@ const MovieListPage = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const token = localStorage.getItem('token');
-
-      console.log("📦 Token from localStorage:", token);
-
       if (!token) {
         setError('Unauthorized: No token found. Please log in.');
         setLoading(false);
@@ -29,18 +26,17 @@ const MovieListPage = () => {
       try {
         const response = await axios.get(API_URL, {
           headers: {
-            Authorization: token // ✅ This must be "JWT eyJ..." exactly
+            Authorization: token // ✅ Must be "JWT eyJ..."
           }
         });
 
-        console.log("✅ Movie data loaded:", response.data);
         setMovies(response.data || []);
       } catch (err) {
-        console.error("❌ Failed to load movies:", err);
+        console.error("❌ Movie fetch failed:", err);
         if (err.response && err.response.status === 401) {
           setError('Unauthorized. Please log in again.');
         } else {
-          setError('Error loading movies.');
+          setError('Failed to load movies.');
         }
       } finally {
         setLoading(false);
@@ -54,8 +50,8 @@ const MovieListPage = () => {
     <div>
       <h1>Top Rated Movies</h1>
 
-      {loading && <p>Loading...</p>}
-      {!loading && error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <p>Loading movies...</p>}
+      {error && !loading && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && movies.length === 0 && <p>No movies found.</p>}
 
       {!loading && !error && movies.map((movie) => {
