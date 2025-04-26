@@ -6,14 +6,15 @@ function LoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/signin`, formData);
-      const token = res.data.token.replace("JWT ", "");
-      localStorage.setItem("token", token);
+      const token = res.data.token; // ✅ no replace!
+      localStorage.setItem("token", token); // ✅ saves full "JWT ..." token
       alert("Login successful!");
       navigate("/movies");
     } catch {
@@ -32,6 +33,7 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
 
 
 
