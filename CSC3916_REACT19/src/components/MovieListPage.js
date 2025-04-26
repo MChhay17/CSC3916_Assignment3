@@ -12,8 +12,8 @@ function MovieListPage() {
     if (!token) return navigate("/login");
 
     axios
-      .get(`${process.env.REACT_APP_API_URL}/movies?reviews=true`, {
-        headers: { Authorization: `JWT ${token}` }
+  .get(`https://csc3916-assignment3-1-fnrr.onrender.com/movies?reviews=true`, {
+    headers: { Authorization: `JWT ${token}` }
       })
       .then((res) => {
         console.log("✅ Movie data loaded:", res.data); // log for debugging
