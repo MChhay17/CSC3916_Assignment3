@@ -12,12 +12,13 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/signin`, formData);
-      const token = res.data.token; // ✅ no replace!
-      localStorage.setItem("token", token); // ✅ saves full "JWT ..." token
+      const res = await axios.post(`https://csc3916-assignment3-1-fnrr.onrender.com/signin`, formData); // 🔥 Hardcoded URL
+      const token = res.data.token;
+      localStorage.setItem("token", token);
       alert("Login successful!");
       navigate("/movies");
-    } catch {
+    } catch (error) {
+      console.error(error);
       alert("Login failed. Check your credentials.");
     }
   };
