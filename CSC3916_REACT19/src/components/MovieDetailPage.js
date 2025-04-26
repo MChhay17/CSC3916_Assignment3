@@ -1,72 +1,60 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import ReviewForm from './ReviewForm'; // 👈 Import ReviewForm!
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import ReviewForm from "./ReviewForm";
 
-function MovieDetailPage() {
-  const { movieId } = useParams(); // ✅ Get movieId from the URL params
+const API_URL = process.env.REACT_APP_API_URL;
+
+const MovieDetailPage = () => {
+  const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  const fetchMovie = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_URL}/movies/${movieId}?reviews=true`, {
+        headers: { Authorization: token },
+      });
+      setMovie(response.data);
+    } catch (err) {
+      setError("Failed to load movie");
+    }
+  };
 
   useEffect(() => {
-    const fetchMovie = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/movies/${movieId}?reviews=true`,
-          {
-            headers: {
-              Authorization: token,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        setMovie(response.data);
-      } catch (err) {
-        console.error('❌ Error fetching movie detail:', err);
-        setError('Failed to load movie.');
-      }
-    };
-
     fetchMovie();
   }, [movieId]);
 
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
-  if (!movie) return <p>Loading movie details...</p>;
+  if (error) return <p>{error}</p>;
+  if (!movie) return <p>Loading...</p>;
 
   return (
     <div>
       <h2>{movie.title}</h2>
-      {movie.imageURL && (
-        <img src={movie.imageURL} alt={movie.title} style={{ width: '200px' }} />
-      )}
+      <img src={movie.imageURL} alt={movie.title} width="200" />
       <p>Genre: {movie.genre}</p>
       <p>Release Date: {movie.releaseDate}</p>
+      <p>Average Rating: {movie.avgRating?.toFixed(1) || "N/A"}</p>
 
-      <h3>Average Rating: {movie.avgRating?.toFixed(1) || 'No reviews yet'}</h3>
+      <ReviewForm movieId={movie._id} onReviewSubmit={fetchMovie} />
 
-      {/* ✅ Add the Review Form */}
-      <ReviewForm movieId={movie._id} />
-
-      {/* ✅ Show existing reviews */}
-      <div style={{ marginTop: '2em' }}>
-        <h3>Reviews:</h3>
-        {movie.reviews && movie.reviews.length > 0 ? (
-          movie.reviews.map((review) => (
-            <div key={review._id} style={{ marginBottom: '1em' }}>
-              <strong>User:</strong> {review.username}<br />
-              <strong>Rating:</strong> {review.rating}<br />
-              <strong>Comment:</strong> {review.review}
-            </div>
-          ))
-        ) : (
-          <p>No reviews yet.</p>
-        )}
-      </div>
+      <h3>Reviews:</h3>
+      {movie.reviews?.length > 0 ? (
+        movie.reviews.map((r) => (
+          <div key={r._id} style={{ marginBottom: "1em" }}>
+            <strong>{r.username}</strong> rated it {r.rating}/5<br />
+            {r.review}
+          </div>
+        ))
+      ) : (
+        <p>No reviews yet.</p>
+      )}
     </div>
   );
-}
+};
 
-export default MovieDetailPage; // ✅ Export it properly
+export default MovieDetailPage;
+
 
 
