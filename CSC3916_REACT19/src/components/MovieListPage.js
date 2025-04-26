@@ -9,8 +9,7 @@ const calculateAverageRating = (reviews) => {
   }
   const sum = reviews.reduce((acc, review) => acc + (review.rating || 0), 0);
   const avg = sum / reviews.length;
-  // Return average to one decimal place (as a string, e.g. "4.5")
-  return avg.toFixed(1);
+  return avg.toFixed(1); // Return average rounded to 1 decimal place
 };
 
 const MovieListPage = () => {
@@ -23,33 +22,28 @@ const MovieListPage = () => {
       setLoading(true);
       setError('');
       try {
-        // Retrieve JWT token from localStorage
         const token = localStorage.getItem('token');
-        console.log('JWT token:', token);
+        console.log('JWT token from storage:', token);
+
         if (!token) {
-          // If no token found, set an unauthorized error message
           setError('Unauthorized: No token found. Please log in.');
           return;
         }
 
-        // Make GET request to fetch movies with Authorization header
         const response = await axios.get(API_URL, {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `JWT ${token}` // ✅ Corrected here
           }
         });
         console.log('Fetched movies data:', response.data);
 
-        // Set movies state with fetched data (assuming response.data is an array of movies)
         setMovies(response.data || []);
       } catch (err) {
         console.error('Error fetching movies:', err);
         if (err.response && err.response.status === 401) {
-          // Handle Unauthorized (401) specifically
-          setError('Unauthorized. Please log in to view movies.');
+          setError('Unauthorized. Please log in again.');
         } else {
-          // Handle other errors (network issues, server errors, etc.)
-          setError('Failed to load movies.');
+          setError('Failed to load movies. Please try again later.');
         }
       } finally {
         setLoading(false);
@@ -65,7 +59,7 @@ const MovieListPage = () => {
 
       {loading && <p>Loading movies...</p>}
 
-      {!loading && error && (
+      {error && !loading && (
         <p style={{ color: 'red' }}>{error}</p>
       )}
 
@@ -75,14 +69,14 @@ const MovieListPage = () => {
 
       {!loading && !error && movies.length > 0 && (
         <div className="movies-list">
-          {movies.map(movie => {
+          {movies.map((movie) => {
             const avgRating = calculateAverageRating(movie.reviews);
             return (
               <div key={movie._id} className="movie-item" style={{ marginBottom: '1em' }}>
                 <h3>{movie.title}</h3>
-                {movie.image && (
+                {movie.imageURL && ( // Ensure you use correct property imageURL (capital URL)
                   <img 
-                    src={movie.image} 
+                    src={movie.imageURL} 
                     alt={movie.title} 
                     style={{ maxWidth: '200px', height: 'auto', display: 'block' }} 
                   />
