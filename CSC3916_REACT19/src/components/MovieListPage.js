@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://csc3916-assignment3-1-fnrr.onrender.com/movies?reviews=true';
+const API_URL = `${process.env.REACT_APP_API_URL}/movies?reviews=true`;
 
 const calculateAverageRating = (reviews) => {
   if (!reviews || reviews.length === 0) return 'N/A';
@@ -17,7 +17,8 @@ const MovieListPage = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const token = localStorage.getItem('token');
-      console.log("📦 JWT Token from localStorage:", token);
+
+      console.log("📦 Token from localStorage:", token);
 
       if (!token) {
         setError('Unauthorized: No token found. Please log in.');
@@ -28,18 +29,18 @@ const MovieListPage = () => {
       try {
         const response = await axios.get(API_URL, {
           headers: {
-            Authorization: `${token}` // ✅ token already includes "JWT " prefix
+            Authorization: token // ✅ This must be "JWT eyJ..." exactly
           }
         });
 
-        console.log("🎬 Movie data loaded:", response.data);
+        console.log("✅ Movie data loaded:", response.data);
         setMovies(response.data || []);
       } catch (err) {
         console.error("❌ Failed to load movies:", err);
         if (err.response && err.response.status === 401) {
           setError('Unauthorized. Please log in again.');
         } else {
-          setError('Error loading movies. Please try again later.');
+          setError('Error loading movies.');
         }
       } finally {
         setLoading(false);
@@ -53,30 +54,26 @@ const MovieListPage = () => {
     <div>
       <h1>Top Rated Movies</h1>
 
-      {loading && <p>Loading movies...</p>}
+      {loading && <p>Loading...</p>}
       {!loading && error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && !error && movies.length === 0 && <p>No movies found.</p>}
 
-      {!loading && !error && movies.length > 0 && (
-        <div className="movies-list">
-          {movies.map((movie) => {
-            const avgRating = calculateAverageRating(movie.reviews);
-            return (
-              <div key={movie._id} style={{ marginBottom: '1.5em' }}>
-                <h3>{movie.title}</h3>
-                {movie.imageURL && (
-                  <img
-                    src={movie.imageURL}
-                    alt={movie.title}
-                    style={{ width: '200px', height: 'auto', display: 'block' }}
-                  />
-                )}
-                <p>Average Rating: {avgRating}</p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {!loading && !error && movies.map((movie) => {
+        const avgRating = calculateAverageRating(movie.reviews);
+        return (
+          <div key={movie._id} style={{ marginBottom: '1.5em' }}>
+            <h3>{movie.title}</h3>
+            {movie.imageURL && (
+              <img
+                src={movie.imageURL}
+                alt={movie.title}
+                style={{ width: '200px', height: 'auto', display: 'block' }}
+              />
+            )}
+            <p>Average Rating: {avgRating}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };
