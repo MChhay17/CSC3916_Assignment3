@@ -123,6 +123,7 @@ router.route('/movies')
     }
   });
 
+// Get movie by ID
 router.route('/movies/:movieparameter')
   .get(authJwtController.isAuthenticated, async (req, res) => {
     const includeReviews = req.query.reviews === 'true';
@@ -158,7 +159,7 @@ router.route('/movies/:movieparameter')
     }
   });
 
-// 🆕 ADDING PUT ROUTE HERE
+// ✅ Update movie by MongoDB ID
 router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (req, res) => {
   try {
     const movieId = req.params.movieparameter;
@@ -169,7 +170,6 @@ router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (
       return res.status(404).json({ success: false, message: 'Movie not found' });
     }
 
-    // Update fields if provided
     if (title) movie.title = title;
     if (releaseDate) movie.releaseDate = releaseDate;
     if (genre) movie.genre = genre;
@@ -177,10 +177,35 @@ router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (
     if (imageURL) movie.imageURL = imageURL;
 
     await movie.save();
-    res.status(200).json({ success: true, message: 'Movie updated successfully', movie });
+    res.status(200).json({ success: true, message: 'Movie updated successfully by ID', movie });
   } catch (err) {
-    console.error('Update error:', err);
-    res.status(500).json({ success: false, message: 'Failed to update movie', error: err.message });
+    console.error('Update by ID error:', err);
+    res.status(500).json({ success: false, message: 'Failed to update movie by ID', error: err.message });
+  }
+});
+
+// ✅ Update movie by title
+router.put('/movies/title/:title', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const movieTitle = req.params.title;
+    const { title, releaseDate, genre, actors, imageURL } = req.body;
+
+    const movie = await Movie.findOne({ title: movieTitle });
+    if (!movie) {
+      return res.status(404).json({ success: false, message: 'Movie with given title not found' });
+    }
+
+    if (title) movie.title = title;
+    if (releaseDate) movie.releaseDate = releaseDate;
+    if (genre) movie.genre = genre;
+    if (actors) movie.actors = actors;
+    if (imageURL) movie.imageURL = imageURL;
+
+    await movie.save();
+    res.status(200).json({ success: true, message: 'Movie updated successfully by title', movie });
+  } catch (err) {
+    console.error('Update by title error:', err);
+    res.status(500).json({ success: false, message: 'Failed to update movie by title', error: err.message });
   }
 });
 
@@ -213,10 +238,7 @@ router.post('/reviews', authJwtController.isAuthenticated, async (req, res) => {
 
     await trackReviewGA4(movie.title, movie.genre, username);
 
-    res.status(201).json({
-      message: 'Review created!',
-      review: newReview
-    });
+    res.status(201).json({ message: 'Review created!', review: newReview });
   } catch (err) {
     console.error("❌ Error saving review or sending analytics:", err);
     res.status(500).json({ message: 'Failed to save review', error: err.message });
