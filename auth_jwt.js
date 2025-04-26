@@ -5,13 +5,14 @@ const User = require('./Users');
 require('dotenv').config();
 
 const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+// ✅ CHANGE: Use 'JWT' instead of Bearer
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
 opts.secretOrKey = process.env.SECRET_KEY;
 
 passport.use(
   new JwtStrategy(opts, async (jwt_payload, done) => {
     try {
-      // FIX: Find user by username so we get req.user.username
+      // Find user by username so req.user is attached
       const user = await User.findOne({ username: jwt_payload.username });
 
       if (user) return done(null, user);
@@ -24,3 +25,4 @@ passport.use(
 
 exports.isAuthenticated = passport.authenticate('jwt', { session: false });
 exports.secret = opts.secretOrKey;
+
