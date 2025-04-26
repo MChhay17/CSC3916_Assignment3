@@ -13,20 +13,21 @@ function LoginPage() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `https://csc3916-assignment3-1-fnrr.onrender.com/signin`,
+        "https://csc3916-assignment3-1-fnrr.onrender.com/signin",
         formData
       );
 
-      // ✅ Ensure token starts with "JWT "
+      // ✅ Ensure token has "JWT " prefix
       const token = res.data.token.startsWith("JWT ")
         ? res.data.token
         : `JWT ${res.data.token}`;
 
+      // ✅ Save to localStorage
       localStorage.setItem("token", token);
       alert("Login successful!");
       navigate("/movies");
     } catch (error) {
-      console.error(error);
+      console.error("Login failed:", error);
       alert("Login failed. Check your credentials.");
     }
   };
@@ -37,6 +38,7 @@ function LoginPage() {
       <input
         name="username"
         placeholder="Username"
+        value={formData.username}
         onChange={handleChange}
         required
       />
@@ -44,6 +46,7 @@ function LoginPage() {
         name="password"
         type="password"
         placeholder="Password"
+        value={formData.password}
         onChange={handleChange}
         required
       />
@@ -53,6 +56,7 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
 
 
 
