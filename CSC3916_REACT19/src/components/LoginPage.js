@@ -17,11 +17,12 @@ function LoginPage() {
         formData
       );
 
-      // ✅ FIXED: Ensure token includes "JWT " prefix
-      const token = res.data.token.startsWith("JWT ")
+      // ✅ FORCE prefix even if missing
+      const token = res.data.token.includes("JWT ")
         ? res.data.token
         : `JWT ${res.data.token}`;
 
+      console.log("✅ Saving token:", token);
       localStorage.setItem("token", token);
       alert("Login successful!");
       navigate("/movies");
@@ -53,6 +54,7 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
 
 
 
