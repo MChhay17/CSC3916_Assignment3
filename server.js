@@ -28,7 +28,7 @@ mongoose.connect(process.env.DB, {
 
 // ====================== ROOT ======================
 app.get("/", (req, res) => {
-  res.send("You made it !! --  Welcome to my API ");
+  res.send("You made it !! -- Welcome to my API");
 });
 
 // ====================== AUTH ======================
@@ -128,7 +128,7 @@ router.route('/movies/:movieparameter')
     const includeReviews = req.query.reviews === 'true';
 
     try {
-      const movie = await Movie.findById(req.params.movieparameter); // ✅ fixed to use _id
+      const movie = await Movie.findById(req.params.movieparameter);
       if (!movie) return res.status(404).json({ success: false, message: 'Movie not found' });
 
       if (includeReviews) {
@@ -157,6 +157,32 @@ router.route('/movies/:movieparameter')
       return res.status(500).json({ success: false, message: 'Failed to fetch movie', error: err.message });
     }
   });
+
+// 🆕 ADDING PUT ROUTE HERE
+router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const movieId = req.params.movieparameter;
+    const { title, releaseDate, genre, actors, imageURL } = req.body;
+
+    const movie = await Movie.findById(movieId);
+    if (!movie) {
+      return res.status(404).json({ success: false, message: 'Movie not found' });
+    }
+
+    // Update fields if provided
+    if (title) movie.title = title;
+    if (releaseDate) movie.releaseDate = releaseDate;
+    if (genre) movie.genre = genre;
+    if (actors) movie.actors = actors;
+    if (imageURL) movie.imageURL = imageURL;
+
+    await movie.save();
+    res.status(200).json({ success: true, message: 'Movie updated successfully', movie });
+  } catch (err) {
+    console.error('Update error:', err);
+    res.status(500).json({ success: false, message: 'Failed to update movie', error: err.message });
+  }
+});
 
 // ====================== REVIEWS ======================
 router.post('/reviews', authJwtController.isAuthenticated, async (req, res) => {
@@ -233,5 +259,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
-
