@@ -17,12 +17,11 @@ function LoginPage() {
         formData
       );
 
-      // ✅ Ensure token has "JWT " prefix
+      // ✅ FIXED: Ensure token includes "JWT " prefix
       const token = res.data.token.startsWith("JWT ")
         ? res.data.token
         : `JWT ${res.data.token}`;
 
-      // ✅ Save to localStorage
       localStorage.setItem("token", token);
       alert("Login successful!");
       navigate("/movies");
@@ -38,7 +37,6 @@ function LoginPage() {
       <input
         name="username"
         placeholder="Username"
-        value={formData.username}
         onChange={handleChange}
         required
       />
@@ -46,7 +44,6 @@ function LoginPage() {
         name="password"
         type="password"
         placeholder="Password"
-        value={formData.password}
         onChange={handleChange}
         required
       />
