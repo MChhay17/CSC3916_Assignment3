@@ -17,6 +17,8 @@ const MovieListPage = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const token = localStorage.getItem('token');
+      console.log("📦 Token being used:", token);
+
       if (!token) {
         setError('Unauthorized: No token found. Please log in.');
         setLoading(false);
@@ -24,19 +26,23 @@ const MovieListPage = () => {
       }
 
       try {
-        const response = await axios.get(API_URL, {
+        const config = {
           headers: {
-            Authorization: token // ✅ Must be "JWT eyJ..."
+            Authorization: token, // ✅ No Bearer, just token as-is
+            'Content-Type': 'application/json'
           }
-        });
+        };
 
+        const response = await axios.get(API_URL, config);
+
+        console.log("✅ Movie data:", response.data);
         setMovies(response.data || []);
       } catch (err) {
-        console.error("❌ Movie fetch failed:", err);
+        console.error("❌ Error fetching movies:", err);
         if (err.response && err.response.status === 401) {
           setError('Unauthorized. Please log in again.');
         } else {
-          setError('Failed to load movies.');
+          setError('Error loading movies.');
         }
       } finally {
         setLoading(false);
@@ -75,6 +81,7 @@ const MovieListPage = () => {
 };
 
 export default MovieListPage;
+
 
 
 
