@@ -12,11 +12,12 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/movies" element={<MovieListPage />} />
-        <Route path="/movies/:id" element={<MovieDetailPage />} />
+        <Route path="/movies/:movieId" element={<MovieDetailPage />} /> {/* ✅ Corrected */}
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
 
