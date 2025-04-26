@@ -13,7 +13,15 @@ const Review = require('./Reviews');
 const trackReviewGA4 = require('./analytics');
 
 const app = express();
-app.use(cors());
+
+// ✅ FIXED: Proper CORS config to allow Authorization headers
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization']
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
@@ -26,12 +34,11 @@ mongoose.connect(process.env.DB, {
 }).then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// ====================== ROOT ======================
 app.get("/", (req, res) => {
   res.send("You made it !! -- Welcome to my API");
 });
 
-// ====================== AUTH ======================
+// ========== SIGNUP ==========
 router.post('/signup', async (req, res) => {
   if (!req.body.username || !req.body.password) {
     return res.status(400).json({ success: false, msg: 'Please include both username and password to signup.' });
@@ -55,6 +62,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+// ========== SIGNIN ==========
 router.post('/signin', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username }).select('name username password');
@@ -74,7 +82,7 @@ router.post('/signin', async (req, res) => {
   }
 });
 
-// ====================== MOVIES ======================
+// ========== MOVIES ==========
 router.route('/movies')
   .get(authJwtController.isAuthenticated, async (req, res) => {
     try {
@@ -104,8 +112,8 @@ router.route('/movies')
   })
   .post(authJwtController.isAuthenticated, async (req, res) => {
     const { title, releaseDate, genre, actors, imageURL } = req.body;
-
     const existingMovie = await Movie.findOne({ title });
+
     if (existingMovie) {
       return res.status(409).json({ success: false, message: "A movie with this title already exists." });
     }
@@ -123,7 +131,6 @@ router.route('/movies')
     }
   });
 
-// Get movie by ID
 router.route('/movies/:movieparameter')
   .get(authJwtController.isAuthenticated, async (req, res) => {
     const includeReviews = req.query.reviews === 'true';
@@ -159,7 +166,7 @@ router.route('/movies/:movieparameter')
     }
   });
 
-// ✅ Update movie by MongoDB ID
+// ========== UPDATE MOVIE ==========
 router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (req, res) => {
   try {
     const movieId = req.params.movieparameter;
@@ -184,32 +191,7 @@ router.put('/movies/:movieparameter', authJwtController.isAuthenticated, async (
   }
 });
 
-// ✅ Update movie by title
-router.put('/movies/title/:title', authJwtController.isAuthenticated, async (req, res) => {
-  try {
-    const movieTitle = req.params.title;
-    const { title, releaseDate, genre, actors, imageURL } = req.body;
-
-    const movie = await Movie.findOne({ title: movieTitle });
-    if (!movie) {
-      return res.status(404).json({ success: false, message: 'Movie with given title not found' });
-    }
-
-    if (title) movie.title = title;
-    if (releaseDate) movie.releaseDate = releaseDate;
-    if (genre) movie.genre = genre;
-    if (actors) movie.actors = actors;
-    if (imageURL) movie.imageURL = imageURL;
-
-    await movie.save();
-    res.status(200).json({ success: true, message: 'Movie updated successfully by title', movie });
-  } catch (err) {
-    console.error('Update by title error:', err);
-    res.status(500).json({ success: false, message: 'Failed to update movie by title', error: err.message });
-  }
-});
-
-// ====================== REVIEWS ======================
+// ========== REVIEWS ==========
 router.post('/reviews', authJwtController.isAuthenticated, async (req, res) => {
   const { movieId, review, rating } = req.body;
   const username = req.user?.username || "anonymous";
@@ -273,6 +255,7 @@ router.delete('/reviews/:id', authJwtController.isAuthenticated, async (req, res
   }
 });
 
+// ========== ROUTING ==========
 app.use('/', router);
 
 const PORT = process.env.PORT || 8080;
@@ -281,3 +264,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
