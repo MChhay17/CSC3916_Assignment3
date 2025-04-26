@@ -13,16 +13,15 @@ function LoginPage() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "https://csc3916-assignment3-1-fnrr.onrender.com/signin",
+        `${process.env.REACT_APP_API_URL}/signin`,
         formData
       );
 
-      // ✅ FORCE prefix even if missing
+      // ✅ Force "JWT " prefix if not already included
       const token = res.data.token.includes("JWT ")
         ? res.data.token
         : `JWT ${res.data.token}`;
 
-      console.log("✅ Saving token:", token);
       localStorage.setItem("token", token);
       alert("Login successful!");
       navigate("/movies");
@@ -54,6 +53,7 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
 
 
 
