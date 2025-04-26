@@ -12,7 +12,7 @@ function MovieListPage() {
 
     axios
       .get(`${process.env.REACT_APP_API_URL}/movies?reviews=true`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `JWT ${token}` } // 🔥 fixed here!
       })
       .then((res) => setMovies(res.data))
       .catch(() => alert("Unauthorized or error loading movies"));
@@ -34,5 +34,6 @@ function MovieListPage() {
 }
 
 export default MovieListPage;
+
 
 
